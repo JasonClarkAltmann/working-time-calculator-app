@@ -8,7 +8,6 @@ import { Minus, Plus } from 'lucide-vue-next'
 
 const toast = useToast()
 
-// Refs für alle Eingabefelder
 const startHours = ref<number>(7)
 const startMinutes = ref<number>(0)
 const workHours = ref<number>(0)
@@ -25,7 +24,6 @@ const calculate = () => {
     const startH = startHours.value
     const startM = startMinutes.value
 
-    // Fall 1: Arbeitsdauer vorhanden → Endzeit berechnen
     if (workHours.value > 0 || workMinutes.value > 0) {
         const totalMinutes = startM + workMinutes.value
         const extraHours = Math.floor(totalMinutes / 60)
@@ -45,14 +43,12 @@ const calculate = () => {
             detail: result.value,
             life: 3000,
         })
-    }
-    // Fall 2: Feierabend vorhanden → Arbeitsdauer berechnen
-    else if (endHours.value > 0 || endMinutes.value > 0) {
+    } else if (endHours.value > 0 || endMinutes.value > 0) {
         const startTotal = startH * 60 + startM
         const endTotal = endHours.value * 60 + endMinutes.value
 
         let duration = endTotal - startTotal
-        if (duration < 0) duration += 1440 // +24h in Minuten
+        if (duration < 0) duration += 1440
 
         workHours.value = Math.floor(duration / 60)
         workMinutes.value = duration % 60
@@ -65,9 +61,7 @@ const calculate = () => {
             detail: result.value,
             life: 3000,
         })
-    }
-    // Fall 3: Keine Angaben
-    else {
+    } else {
         result.value = 'Bitte entweder Arbeitsdauer oder Feierabend eingeben!'
 
         toast.add({
@@ -89,7 +83,7 @@ const calculate = () => {
             </div>
         </template>
         <div class="flex flex-col items-center justify-center">
-            <div class="text-xl font-bold">Wann bist du heute zur Arbeit?</div>
+            <div class="text-xl mb-2 font-bold">Wann bist du heute zur Arbeit?</div>
             <div class="flex flex-row gap-4 items-center justify-center">
                 <InputNumber
                     v-model="startHours"
@@ -125,7 +119,7 @@ const calculate = () => {
                 <div class="text-2xl font-bold">Uhr</div>
             </div>
             <Divider />
-            <div class="text-xl font-bold">Wie lange willst du heute arbeiten?</div>
+            <div class="text-xl mb-2 font-bold">Wie lange willst du heute arbeiten?</div>
             <div class="flex flex-row gap-4 items-center justify-center">
                 <InputNumber
                     v-model="workHours"
@@ -161,7 +155,7 @@ const calculate = () => {
                 <div class="text-2xl font-bold">min</div>
             </div>
             <Divider />
-            <div class="text-xl font-bold">Wie lange willst du heute arbeiten?</div>
+            <div class="text-xl mb-2 font-bold">Wie lange willst du heute arbeiten?</div>
             <div class="flex flex-row gap-4 items-center justify-center">
                 <InputNumber
                     v-model="endHours"
