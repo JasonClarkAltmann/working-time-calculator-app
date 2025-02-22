@@ -22,6 +22,7 @@ const activeTab = ref('0')
 
 const startHours = ref<number>(8)
 const startMinutes = ref<number>(0)
+const breakDuration = ref<number>(30)
 
 const endHours0 = ref<number>(startHours.value)
 const endMinutes0 = ref<number>(0)
@@ -46,22 +47,21 @@ const toTimeString = (totalMinutes: number): string => {
 
 const padTime = (num: number): string => num.toString().padStart(2, '0')
 
-const calculateOvertime = (duration: number, tab: string) => {
+const calculateOvertime = (netDuration: number, tab: string) => {
     const regularHours = 8 * 60
-    const overtimeTotal = duration - regularHours
+    const overtimeTotal = netDuration - regularHours
+
+    const absOvertime = Math.abs(overtimeTotal)
+    const hours = Math.floor(absOvertime / 60)
+    const minutes = absOvertime % 60
+    const sign = overtimeTotal >= 0 ? 1 : -1
 
     if (tab === '0') {
-        overtimeHours0.value = Math.floor(Math.abs(overtimeTotal) / 60)
-        overtimeMinutes0.value = Math.abs(overtimeTotal) % 60
-        if (overtimeTotal < 0) {
-            overtimeHours0.value = -overtimeHours0.value
-        }
+        overtimeHours0.value = hours * sign
+        overtimeMinutes0.value = minutes * sign
     } else {
-        overtimeHours1.value = Math.floor(Math.abs(overtimeTotal) / 60)
-        overtimeMinutes1.value = Math.abs(overtimeTotal) % 60
-        if (overtimeTotal < 0) {
-            overtimeHours1.value = -overtimeHours1.value
-        }
+        overtimeHours1.value = hours * sign
+        overtimeMinutes1.value = minutes * sign
     }
 }
 
@@ -79,15 +79,16 @@ const calculate = () => {
             let duration = endTotal - startTotal
             if (duration < 0) duration += 1440
 
-            workHours0.value = Math.floor(duration / 60)
-            workMinutes0.value = duration % 60
+            const netDuration = duration - breakDuration.value
+            workHours0.value = Math.floor(netDuration / 60)
+            workMinutes0.value = netDuration % 60
 
-            calculateOvertime(duration, '0')
+            calculateOvertime(netDuration, '0')
 
             toast.add({
                 severity: 'success',
                 summary: 'Arbeitsdauer berechnet',
-                detail: `Arbeitsdauer: ${workHours0.value}h ${padTime(workMinutes0.value)}m`,
+                detail: `Arbeitsdauer: ${workHours0.value}h ${padTime(workMinutes0.value)}m (inkl. ${breakDuration.value} min Pause)`,
                 life: 3000,
             })
         } else {
@@ -99,7 +100,7 @@ const calculate = () => {
 
             if (workTotal <= 0) throw new Error('Bitte Arbeitsdauer eingeben!')
 
-            const total = startTotal + workTotal
+            const total = startTotal + workTotal + breakDuration.value
             endHours1.value = Math.floor((total % 1440) / 60)
             endMinutes1.value = total % 60
 
@@ -108,7 +109,7 @@ const calculate = () => {
             toast.add({
                 severity: 'success',
                 summary: 'Feierabend berechnet',
-                detail: `Feierabend: ${toTimeString(total)} Uhr`,
+                detail: `Feierabend: ${toTimeString(total)} Uhr (inkl. ${breakDuration.value} min Pause)`,
                 life: 3000,
             })
         }
@@ -125,6 +126,7 @@ const calculate = () => {
 const reset = () => {
     startHours.value = 8
     startMinutes.value = 0
+    breakDuration.value = 30
     overtimeHours0.value = 0
     overtimeMinutes0.value = 0
     overtimeHours1.value = 0
@@ -149,7 +151,7 @@ const reset = () => {
             </div>
         </template>
         <div class="flex flex-col items-center justify-center">
-            <div class="text-xl mb-4 font-bold">Arbeitsbeginn:</div>
+            <div class="text-xl mb-2 font-bold">Arbeitsbeginn:</div>
             <div class="flex flex-row gap-2 items-center justify-center">
                 <InputNumber
                     v-model="startHours"
@@ -173,22 +175,60 @@ const reset = () => {
 
             <Divider />
 
-            <div class="flex gap-2 justify-end">
-                <ButtonGroup>
-                    <Button
-                        @click="activeTab = '0'"
-                        :outlined="activeTab !== '0'"
-                        label="Feierabend"
-                        rounded
-                    />
-                    <Button
-                        @click="activeTab = '1'"
-                        :outlined="activeTab !== '1'"
-                        label="Arbeitszeit"
-                        rounded
-                    />
-                </ButtonGroup>
-            </div>
+            <div class="text-xl mb-2 font-bold">Pausenzeit:</div>
+            <ButtonGroup class="w-full">
+                <Button
+                    @click="breakDuration = 0"
+                    :outlined="breakDuration !== 0"
+                    label="Keine"
+                    class="w-full"
+                    size="small"
+                    rounded
+                />
+                <Button
+                    @click="breakDuration = 30"
+                    :outlined="breakDuration !== 30"
+                    label="30 min"
+                    class="w-full"
+                    size="small"
+                    rounded
+                />
+                <Button
+                    @click="breakDuration = 45"
+                    :outlined="breakDuration !== 45"
+                    label="45 min"
+                    class="w-full"
+                    size="small"
+                    rounded
+                />
+                <Button
+                    @click="breakDuration = 60"
+                    :outlined="breakDuration !== 60"
+                    label="1 h"
+                    class="w-full"
+                    size="small"
+                    rounded
+                />
+            </ButtonGroup>
+
+            <Divider />
+
+            <ButtonGroup class="w-full">
+                <Button
+                    @click="activeTab = '0'"
+                    :outlined="activeTab !== '0'"
+                    label="Feierabend"
+                    rounded
+                    class="w-full"
+                />
+                <Button
+                    @click="activeTab = '1'"
+                    :outlined="activeTab !== '1'"
+                    label="Arbeitszeit"
+                    rounded
+                    class="w-full"
+                />
+            </ButtonGroup>
 
             <Tabs v-model:value="activeTab">
                 <TabPanels>
@@ -270,12 +310,16 @@ const reset = () => {
                     v-if="activeTab === '0'"
                     class="flex flex-row text-xl font-bold justify-center"
                 >
-                    <AlarmClockPlus v-if="overtimeHours0 > 0" class="mr-2" />
-                    <AlarmClockMinus v-else-if="overtimeHours0 < 0" class="mr-2" />
+                    <AlarmClockPlus v-if="overtimeHours0 + overtimeMinutes0 > 0" class="mr-2" />
+                    <AlarmClockMinus
+                        v-else-if="overtimeHours0 + overtimeMinutes0 < 0"
+                        class="mr-2"
+                    />
                     <AlarmClock v-else class="mr-2" />
                     <span v-if="overtimeHours0 !== 0 || overtimeMinutes0 !== 0">
-                        {{ overtimeHours0 > 0 ? 'Überstunden' : 'Minusstunden' }}:
-                        {{ padTime(Math.abs(overtimeHours0)) }}h
+                        {{
+                            overtimeHours0 + overtimeMinutes0 > 0 ? 'Überstunden' : 'Minusstunden'
+                        }}: {{ padTime(Math.abs(overtimeHours0)) }}h
                         {{ padTime(Math.abs(overtimeMinutes0)) }}m
                     </span>
                     <span v-else>Keine Über-/Minusstunden</span>
@@ -284,12 +328,16 @@ const reset = () => {
                     v-if="activeTab === '1'"
                     class="flex flex-row text-xl font-bold justify-center"
                 >
-                    <AlarmClockPlus v-if="overtimeHours1 > 0" class="mr-2" />
-                    <AlarmClockMinus v-else-if="overtimeHours1 < 0" class="mr-2" />
+                    <AlarmClockPlus v-if="overtimeHours1 + overtimeMinutes1 > 0" class="mr-2" />
+                    <AlarmClockMinus
+                        v-else-if="overtimeHours1 + overtimeMinutes1 < 0"
+                        class="mr-2"
+                    />
                     <AlarmClock v-else class="mr-2" />
                     <span v-if="overtimeHours1 !== 0 || overtimeMinutes1 !== 0">
-                        {{ overtimeHours1 > 0 ? 'Überstunden' : 'Minusstunden' }}:
-                        {{ padTime(Math.abs(overtimeHours1)) }}h
+                        {{
+                            overtimeHours1 + overtimeMinutes1 > 0 ? 'Überstunden' : 'Minusstunden'
+                        }}: {{ padTime(Math.abs(overtimeHours1)) }}h
                         {{ padTime(Math.abs(overtimeMinutes1)) }}m
                     </span>
                     <span v-else>Keine Über-/Minusstunden</span>
@@ -302,7 +350,7 @@ const reset = () => {
                         activeTab === '0' &&
                         toMinutes(endHours0, endMinutes0) <= toMinutes(startHours, startMinutes)
                     "
-                    class="w-full"
+                    fluid
                     disabled
                     label="Berechnen"
                 >
@@ -312,7 +360,7 @@ const reset = () => {
                 </Button>
                 <Button
                     v-else-if="activeTab === '1' && toMinutes(workHours1, workMinutes1) <= 0"
-                    class="w-full"
+                    fluid
                     disabled
                     label="Berechnen"
                 >
@@ -320,7 +368,7 @@ const reset = () => {
                         <Calculator />
                     </template>
                 </Button>
-                <Button v-else class="w-full" @click="calculate" label="Berechnen">
+                <Button v-else fluid @click="calculate" label="Berechnen">
                     <template #icon>
                         <Calculator />
                     </template>
