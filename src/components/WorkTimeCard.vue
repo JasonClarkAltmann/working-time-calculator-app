@@ -143,7 +143,7 @@ const reset = () => {
 </script>
 
 <template>
-    <Panel class="w-screen h-screen sm:h-fit sm:w-fit p-4">
+    <Panel class="w-dvh h-dvh sm:h-fit sm:w-fit p-4">
         <template #header>
             <div class="flex flex-col">
                 <h2 class="text-3xl font-bold">Jasons Arbeitszeitrechner:</h2>
