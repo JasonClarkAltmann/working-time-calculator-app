@@ -10,9 +10,9 @@ import { ToastService } from 'primevue'
 const app = createApp(App)
 
 app.use(PrimeVue, {
-  theme: {
-    preset: Aura,
-  },
+    theme: {
+        preset: Aura,
+    },
 })
 app.use(ToastService)
 app.use(router)
