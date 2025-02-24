@@ -15,6 +15,7 @@ import {
     Calculator,
     House,
     RotateCcw,
+    Timer,
 } from 'lucide-vue-next'
 
 const toast = useToast()
@@ -258,9 +259,9 @@ const reset = () => {
                             <Divider />
 
                             <div class="flex flex-row text-xl font-bold">
-                                <House class="mr-2" />
+                                <Timer class="mr-2" />
                                 <div>
-                                    Arbeitsdauer: {{ padTime(workHours0) }}h
+                                    Arbeitszeit: {{ padTime(workHours0) }}h
                                     {{ padTime(workMinutes0) }}m
                                 </div>
                             </div>
