@@ -124,6 +124,12 @@ const calculate = () => {
     }
 }
 
+const getEndTime = () => {
+    const endTime = new Date()
+    endHours0.value = endTime.getHours()
+    endMinutes0.value = endTime.getMinutes()
+}
+
 const reset = () => {
     startHours.value = 8
     startMinutes.value = 0
@@ -218,17 +224,21 @@ const reset = () => {
                 <Button
                     @click="activeTab = '0'"
                     :outlined="activeTab !== '0'"
-                    label="Feierabend"
                     rounded
                     class="w-full"
-                />
+                >
+                    <House />
+                    Feierabend
+                </Button>
                 <Button
                     @click="activeTab = '1'"
                     :outlined="activeTab !== '1'"
-                    label="Arbeitszeit"
                     rounded
                     class="w-full"
-                />
+                >
+                    <Timer />
+                    Arbeitszeit
+                </Button>
             </ButtonGroup>
 
             <Tabs v-model:value="activeTab">
@@ -236,6 +246,13 @@ const reset = () => {
                     <TabPanel value="0">
                         <div class="flex flex-col items-center justify-center">
                             <div class="flex flex-row gap-2 items-center justify-center">
+                                <Button
+                                    @click="getEndTime"
+                                    label="Jetzt"
+                                    class="mr-4"
+                                    size="small"
+                                    outlined
+                                />
                                 <InputNumber
                                     v-model="endHours0"
                                     showButtons
