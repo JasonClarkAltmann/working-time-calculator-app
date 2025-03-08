@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import WorkTimeCard from '../components/WorkTimeCard.vue'
+import WorkTimeCard from '@/components/WorkTimeCard.vue'
 </script>
 
 <template>
