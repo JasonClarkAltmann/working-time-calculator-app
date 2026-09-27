@@ -1,39 +1,23 @@
-# working-time-calculator-app
+# Jasons Arbeitszeitrechner
 
-This template should help get you started developing with Vue 3 in Vite.
+Eine responsive Web-App im Dark Mode zum Berechnen von Arbeitszeit und Feierabend. Zeiten und Pause lassen sich direkt ändern; das Ergebnis und die Über- oder Minusstunden aktualisieren sich sofort. Die Zeitfelder haben Pfeile zum Klicken und Gedrückthalten. Stunden laufen zwischen 0 und 23 um, Minuten zwischen 0 und 59.
 
-## Recommended IDE Setup
+## Bedienung
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+1. Arbeitsbeginn einstellen.
+2. Unter **Feierabend** die Endzeit eingeben oder mit **Jetzt übernehmen** die aktuelle Uhrzeit setzen. Die Nettoarbeitszeit erscheint im Ergebnisbereich.
+3. Unter **Arbeitsdauer** stattdessen die gewünschte Nettoarbeitszeit eingeben. Der Ergebnisbereich zeigt die Feierabendzeit.
+4. Eine Pause von 0, 30, 45 oder 60 Minuten wählen.
 
-## Type Support for `.vue` Imports in TS
+Eine Endzeit vor dem Arbeitsbeginn gilt als Folgetag. Berechneter Feierabend am Folgetag wird ebenfalls gekennzeichnet. Start und Ende zur gleichen Uhrzeit sowie Schichten ab 24 Stunden sind ungültig. Eine Pause darf höchstens so lang sein wie die Anwesenheit. Über- und Minusstunden werden gegenüber einem Achtstundentag berechnet.
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Lokal starten
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+Voraussetzung: Node.js 20.19+ oder 22.12+ und npm.
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+`npm run build` führt die TypeScript-Prüfung und den Produktionsbuild aus. Die App verwendet React, TypeScript, Vite, Tailwind CSS, shadcn/ui und Lucide.
