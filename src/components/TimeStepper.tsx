@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { toHoursAndMinutes, toMinutes } from '@/utils/workTime'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 type TimeStepperProps = {
     label: string
@@ -65,31 +65,33 @@ function StepperField({ label, value, max, onChange }: StepperFieldProps) {
         else setDraft(value === null ? '' : pad(value))
     }
 
-    const buttonClass =
-        'flex h-8 w-full touch-none items-center justify-center text-(--app-muted) transition-colors hover:bg-(--app-accent-soft) hover:text-(--app-accent-bright) active:bg-(--app-accent-soft) focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--app-accent)'
+    const stepButton = (direction: 1 | -1) => (
+        <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`${label} ${direction === 1 ? 'erhöhen' : 'verringern'}`}
+            className="h-8 w-full touch-none rounded-none text-muted-foreground hover:text-primary"
+            onPointerDown={(event) => startRepeat(event, direction)}
+            onPointerUp={stopRepeat}
+            onPointerCancel={stopRepeat}
+            onPointerLeave={stopRepeat}
+            onClick={(event) => {
+                if (event.detail === 0) step(direction)
+            }}
+        >
+            {direction === 1 ? <ChevronUp /> : <ChevronDown />}
+        </Button>
+    )
 
     return (
-        <div className="w-[4.25rem] overflow-hidden rounded-2xl border border-(--app-border-strong) bg-(--app-control) shadow-sm shadow-black/20 sm:w-[4.75rem]">
-            <button
-                type="button"
-                aria-label={`${label} erhöhen`}
-                className={buttonClass}
-                onPointerDown={(event) => startRepeat(event, 1)}
-                onPointerUp={stopRepeat}
-                onPointerCancel={stopRepeat}
-                onPointerLeave={stopRepeat}
-                onClick={(event) => {
-                    if (event.detail === 0) step(1)
-                }}
-            >
-                <ChevronUp className="size-4" strokeWidth={2.5} />
-            </button>
+        <div className="w-17 overflow-hidden rounded-xl border sm:w-19 border-input bg-input/30 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:bg-primary/10 focus-within:ring-ring/50">
+            {stepButton(1)}
             <input
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
                 aria-label={label}
-                className="h-12 w-full border-y border-(--app-border-strong) bg-transparent text-center text-2xl font-semibold tabular-nums tracking-tight text-(--app-text) placeholder:text-(--app-subtle) outline-none focus:bg-(--app-accent-soft) focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--app-accent) sm:h-14"
+                className="h-12 w-full border-y border-input bg-transparent text-center text-2xl font-semibold sm:h-14 tracking-tight tabular-nums outline-none placeholder:text-muted-foreground/60"
                 value={draft}
                 placeholder="--"
                 onFocus={(event) => {
@@ -110,20 +112,7 @@ function StepperField({ label, value, max, onChange }: StepperFieldProps) {
                     if (event.key === 'Enter') event.currentTarget.blur()
                 }}
             />
-            <button
-                type="button"
-                aria-label={`${label} verringern`}
-                className={buttonClass}
-                onPointerDown={(event) => startRepeat(event, -1)}
-                onPointerUp={stopRepeat}
-                onPointerCancel={stopRepeat}
-                onPointerLeave={stopRepeat}
-                onClick={(event) => {
-                    if (event.detail === 0) step(-1)
-                }}
-            >
-                <ChevronDown className="size-4" strokeWidth={2.5} />
-            </button>
+            {stepButton(-1)}
         </div>
     )
 }
@@ -141,13 +130,7 @@ export function TimeStepper({ label, value, onChange, kind = 'clock' }: TimeStep
                 max={23}
                 onChange={updateHours}
             />
-            <span
-                className={cn(
-                    'text-2xl font-semibold leading-none text-(--app-muted)',
-                    kind === 'duration' && 'text-lg text-(--app-muted)',
-                )}
-                aria-hidden="true"
-            >
+            <span className="text-2xl font-semibold text-muted-foreground" aria-hidden="true">
                 {kind === 'clock' ? ':' : 'h'}
             </span>
             <StepperField
@@ -156,7 +139,7 @@ export function TimeStepper({ label, value, onChange, kind = 'clock' }: TimeStep
                 max={59}
                 onChange={updateMinutes}
             />
-            <span className="text-[0.9375rem] font-medium leading-none text-(--app-muted)" aria-hidden="true">
+            <span className="w-8 text-base font-medium text-muted-foreground" aria-hidden="true">
                 {kind === 'clock' ? 'Uhr' : 'min'}
             </span>
         </div>
