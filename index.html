@@ -1,9 +1,19 @@
 <!doctype html>
-<html lang="de" class="dark">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#09090b" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      {
+        const theme = localStorage.getItem('theme') ?? 'system'
+        const dark =
+          theme === 'dark' ||
+          (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.classList.toggle('dark', dark)
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        document.documentElement.dataset.accent = localStorage.getItem('accent') ?? 'neutral'
+      }
+    </script>
     <link rel="icon" href="/timer.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jasons Arbeitszeitrechner</title>

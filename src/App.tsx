@@ -1,4 +1,5 @@
 import { Clock3 } from 'lucide-react'
+import { AppearanceMenu } from '@/components/AppearanceMenu'
 import { MobileSummary } from '@/components/MobileSummary'
 import { ResultCards } from '@/components/ResultCards'
 import { WorkDayCard } from '@/components/WorkDayCard'
@@ -28,6 +29,9 @@ export default function App() {
                         <p className="text-sm text-muted-foreground">
                             Arbeitszeit und Gleitzeit auf einen Blick
                         </p>
+                    </div>
+                    <div className="ml-auto">
+                        <AppearanceMenu />
                     </div>
                 </header>
 
