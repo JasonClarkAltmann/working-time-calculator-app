@@ -31,3 +31,13 @@ export const calculateEndMinutes = (
 ) => startMinutes + workMinutes + breakMinutes
 
 export const calculateOvertimeMinutes = (workMinutes: number) => workMinutes - REGULAR_WORK_MINUTES
+
+export const formatDuration = (totalMinutes: number): string => {
+    const { hours, minutes } = toHoursAndMinutes(totalMinutes)
+    return `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m`
+}
+
+export const formatSignedDuration = (totalMinutes: number): string => {
+    const sign = totalMinutes > 0 ? '+' : totalMinutes < 0 ? '−' : ''
+    return `${sign}${formatDuration(Math.abs(totalMinutes))}`
+}
